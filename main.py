@@ -1,25 +1,45 @@
-# 1. Criamos o dicionário com as gírias (chaves) e significados (valores)
-meme_dict = {
-    "CRINGE": "Algo vergonhoso ou constrangedor",
-    "STALKEAR": "Investigar a vida de alguém online",
-    "VDD": "Abreviação da palavra 'verdade'",
-    "BISCOITAR": "Postar algo apenas para chamar a atenção",
-    "HATER": "Pessoa que está constantemente criticando os outros",
-    "VLW": "Abreviação da palavra 'valeu'"
-}
+import discord
+# 1. Nova importação lá no topo como solicitado
+from discord.ext import commands   
+# Importando a função do seu arquivo de lógica
+from bot_logic import gen_pass  
 
-# Desafio extra 3: Saudação inicial
-print("=== Bem-vindo ao Dicionário de Gírias da Internet! ===")
-print("Ajude as gerações passadas a entenderem o que a gente fala.\n")
+# Configuração dos privilégios (Intents)
+intents = discord.Intents.default()
+intents.message_content = True
 
-# Desafio extra 2: Loop para repetir o processo 5 vezes
-for i in range(5):
-    word = input("Digite uma gíria em LETRAS MAIÚSCULAS para traduzir: ")
+# 2. Definindo o bot e o prefixo escolhido ($)
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'O bot {bot.user} está online e pronto para os comandos!')
+
+# 3. Criando as funções usando o decorador @bot.command()
+
+# Comando: $hello
+@bot.command()
+async def hello(ctx):
+    await ctx.send("Hi!")
+
+# Comando: $pasw (Chama a função gen_pass passando o valor 10)
+@bot.command()
+async def pasw(ctx):
+    senha = gen_pass(10)
+    await ctx.send(f"Sua senha gerada: {senha}")
     
-    # Conferindo se a palavra existe no nosso dicionário
-    if word in meme_dict.keys():
-        print("Significado: " + meme_dict[word] + "\n")
-    else:
-        print("Ainda não temos essa gíria... Mas estamos trabalhando nela!\n")
+@bot.command()
+async def repeat(ctx, times: int, content='repeating...'):
+    """Repeats a message multiple times."""
+    for i in range(times):
+        await ctx.send(content)
 
-print("Fim das 5 tentativas de pesquisa!")
+
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    """Says when a member joined."""
+    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+
+
+# Execução do bot (substitua pelo seu token caso tenha resetado)
+bot.run("token")
